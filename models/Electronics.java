@@ -1,26 +1,29 @@
 package models;
 
-import java.util.Scanner;
 import utils.InputHelper;
+import java.util.Scanner;
 
 public class Electronics extends Product {
     private int warrantyMonths;
 
+    public Electronics() {}
+
     @Override
     public void nhapThongTin(Scanner scanner) {
         System.out.println("\n--- NHẬP ĐỒ ĐIỆN TỬ ---");
-        super.nhapThongTin(scanner);
-        this.warrantyMonths = InputHelper.nhapSoNguyenDuong(scanner, "Nhập số tháng bảo hành: ");
+        super.nhapThongTin(scanner); 
+        this.warrantyMonths = InputHelper.nhapSo(scanner, "Nhập số tháng bảo hành");
     }
 
     @Override
     public double calculateFinalPrice() {
-        return this.basePrice + (this.basePrice * 0.05); // Phí bảo hành 5%
+        // Đa hình: Đồ điện tử cộng thêm 5% phí bảo hành vào giá gốc
+        return basePrice + (basePrice * 0.05);
     }
 
     @Override
     public void xuatThongTin() {
-        super.xuatThongTin();
-        System.out.printf(" | Bảo hành: %d tháng | Giá bán: %.0f VNĐ\n", warrantyMonths, calculateFinalPrice());
+        System.out.printf("[Điện tử]   Mã: %s | Tên: %s | SL: %d | Giá gốc: %d | Bảo hành: %d tháng | Giá bán: %.0f VNĐ\n",
+                id, name, quantity, basePrice, warrantyMonths, calculateFinalPrice());
     }
 }

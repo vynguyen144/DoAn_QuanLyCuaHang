@@ -1,29 +1,32 @@
 package models;
 
+import utils.InputHelper;
 import java.util.Scanner;
 
 public class Clothing extends Product {
     private String size;
 
+    public Clothing() {}
+
     @Override
     public void nhapThongTin(Scanner scanner) {
         System.out.println("\n--- NHẬP QUẦN ÁO ---");
         super.nhapThongTin(scanner);
-        System.out.print("Nhập Size (S/M/L/XL): ");
-        this.size = scanner.nextLine().toUpperCase();
+        this.size = InputHelper.nhapChuoi(scanner, "Nhập kích cỡ (S/M/L/XL)");
     }
 
     @Override
     public double calculateFinalPrice() {
-        if (this.size.equals("XL")) {
-            return this.basePrice * 1.1; // Size XL phụ thu 10% vải
+        // Đa hình: Nếu là size XL hoặc XXL thì phụ thu thêm 10%
+        if (size.equalsIgnoreCase("XL") || size.equalsIgnoreCase("XXL")) {
+            return basePrice + (basePrice * 0.1);
         }
-        return this.basePrice;
+        return basePrice;
     }
 
     @Override
     public void xuatThongTin() {
-        super.xuatThongTin();
-        System.out.printf(" | Size: %s | Giá bán: %.0f VNĐ\n", size, calculateFinalPrice());
+        System.out.printf("[Quần áo]   Mã: %s | Tên: %s | SL: %d | Giá gốc: %d | Size: %s | Giá bán: %.0f VNĐ\n",
+                id, name, quantity, basePrice, size.toUpperCase(), calculateFinalPrice());
     }
 }

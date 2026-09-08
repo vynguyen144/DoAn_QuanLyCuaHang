@@ -1,7 +1,7 @@
 package models;
 
-import utils.InputHelper;
 import java.util.Scanner;
+import utils.InputHelper;
 
 public abstract class Product {
     protected String id;
@@ -9,18 +9,25 @@ public abstract class Product {
     protected int quantity;
     protected int basePrice;
 
-    public abstract double calculateFinalPrice();
+    public Product() {}
 
     public void nhapThongTin(Scanner scanner) {
-        System.out.print("Nhập mã sản phẩm: ");
-        this.id = scanner.nextLine();
-        System.out.print("Nhập tên sản phẩm: ");
-        this.name = scanner.nextLine();
-        this.quantity = InputHelper.nhapSoNguyenDuong(scanner, "Nhập số lượng tồn kho: ");
-        this.basePrice = InputHelper.nhapSoNguyenDuong(scanner, "Nhập giá bán cơ bản (VNĐ): ");
+        this.id = InputHelper.nhapChuoi(scanner, "Nhập mã sản phẩm");
+        this.name = InputHelper.nhapChuoi(scanner, "Nhập tên sản phẩm");
+        this.quantity = InputHelper.nhapSo(scanner, "Nhập số lượng");
+        this.basePrice = InputHelper.nhapSo(scanner, "Nhập giá gốc (VNĐ)");
     }
 
-    public void xuatThongTin() {
-        System.out.printf("Mã: %s | Tên: %s | SL: %d | Giá gốc: %d", id, name, quantity, basePrice);
-    }
+    public abstract double calculateFinalPrice();
+    public abstract void xuatThongTin();
+
+    // --- CÁC HÀM GETTER / SETTER ĐỂ HỖ TRỢ BÁN HÀNG ---
+    public String getId() { return this.id; }
+    public String getName() { return this.name; }
+    public int getQuantity() { return this.quantity; }
+    public void setQuantity(int quantity) { this.quantity = quantity; }
+    public void setId(String id) { this.id = id; }
+    public void setName(String name) { this.name = name; }
+    public int getBasePrice() { return this.basePrice; }
+    public void setBasePrice(int basePrice) { this.basePrice = basePrice; }
 }
