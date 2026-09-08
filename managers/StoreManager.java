@@ -33,6 +33,16 @@ public class StoreManager {
             return;
         }
 
+        // Kiểm tra mã trùng ngay từ đầu trước khi cho phép nhập tiếp
+        String maSP = InputHelper.nhapChuoi(scanner, "Nhập mã sản phẩm (ID)");
+        
+        for (Product p : productList) {
+            if (p.getId().equalsIgnoreCase(maSP)) {
+                System.out.println("-> LỖI: Mã sản phẩm '" + maSP + "' đã tồn tại trong kho! Vui lòng dùng mã khác.");
+                return;
+            }
+        }
+
         Product product = null;
         switch (loai) {
             case 1:
@@ -49,11 +59,25 @@ public class StoreManager {
                 return;
         }
 
-        product.nhapThongTin(scanner);
-        productList.add(product);
+        // Gán mã và nhập các thông số cơ bản
+        product.setId(maSP);
+        System.out.println("--- Nhập thông tin chi tiết ---");
+        product.setName(InputHelper.nhapChuoi(scanner, "Nhập tên sản phẩm"));
+        product.setQuantity(InputHelper.nhapSo(scanner, "Nhập số lượng tồn kho"));
+        product.setBasePrice(InputHelper.nhapSo(scanner, "Nhập giá gốc (VNĐ)"));
         
+        // Nhập thuộc tính đặc thù riêng cho từng loại con
+        if (product instanceof Food) {
+            ((Food) product).setExpiryDays(InputHelper.nhapSo(scanner, "Nhập số ngày còn hạn sử dụng"));
+        } else if (product instanceof Electronics) {
+            ((Electronics) product).setWarrantyMonths(InputHelper.nhapSo(scanner, "Nhập thời gian bảo hành (tháng)"));
+        } else if (product instanceof Clothing) {
+            ((Clothing) product).setSize(InputHelper.nhapChuoi(scanner, "Nhập kích cỡ (Size S/M/L/XL)"));
+        }
+
+        productList.add(product);
         FileManager.ghiFile(productList);
-        System.out.println("-> Thêm sản phẩm thành công!");
+        System.out.println("-> Thêm sản phẩm thành công và đã lưu vào tệp!");
     }
 
     public void hienThiDanhSach() {
@@ -73,7 +97,7 @@ public class StoreManager {
 
         Product productToEdit = null;
         for (Product p : productList) {
-            if (p.getId().equals(maSP)) {
+            if (p.getId().equalsIgnoreCase(maSP)) {
                 productToEdit = p;
                 break;
             }
@@ -85,25 +109,54 @@ public class StoreManager {
         }
 
         System.out.println("-> Đã tìm thấy sản phẩm! Vui lòng nhập thông tin mới:");
-        productToEdit.nhapThongTin(scanner);
+        // Giữ lại mã cũ, chỉ cho nhập lại thông tin chi tiết
+        productToEdit.setName(InputHelper.nhapChuoi(scanner, "Nhập tên sản phẩm mới"));
+        productToEdit.setQuantity(InputHelper.nhapSo(scanner, "Nhập số lượng tồn kho mới"));
+        productToEdit.setBasePrice(InputHelper.nhapSo(scanner, "Nhập giá gốc mới (VNĐ)"));
+
+        if (productToEdit instanceof Food) {
+            ((Food) productToEdit).setExpiryDays(InputHelper.nhapSo(scanner, "Nhập số ngày còn hạn mới"));
+        } else if (productToEdit instanceof Electronics) {
+            ((Electronics) productToEdit).setWarrantyMonths(InputHelper.nhapSo(scanner, "Nhập thời gian bảo hành mới (tháng)"));
+        } else if (productToEdit instanceof Clothing) {
+            ((Clothing) productToEdit).setSize(InputHelper.nhapChuoi(scanner, "Nhập kích cỡ mới (Size S/M/L/XL)"));
+        }
         
         FileManager.ghiFile(productList);
         System.out.println("-> CẬP NHẬT THÀNH CÔNG VÀ ĐÃ LƯU VÀO TỆP!");
     }
 
-    public void xoaSanPham(Scanner scanner) {
-        System.out.println("\n--- XÓA SẢN PHẨM KHỎI KHO ---");
-        String maSP = InputHelper.nhapChuoi(scanner, "Nhập mã sản phẩm cần xóa");
+    public void giamSoLuongSanPham(Scanner scanner) {
+        System.out.println("\n--- GIẢM SỐ LƯỢNG TỒN KHO ---");
+        String maSP = InputHelper.nhapChuoi(scanner, "Nhập mã sản phẩm cần giảm số lượng");
 
-        // Tìm và xóa sản phẩm nếu trùng mã
-        boolean removed = productList.removeIf(p -> p.getId().equals(maSP));
-
-        if (removed) {
-            FileManager.ghiFile(productList);
-            System.out.println("-> XÓA THÀNH CÔNG VÀ ĐÃ CẬP NHẬT TỆP!");
-        } else {
-            System.out.println("-> LỖI: Không tìm thấy sản phẩm có mã '" + maSP + "' trong kho!");
+        Product productToUpdate = null;
+        for (Product p : productList) {
+            if (p.getId().equalsIgnoreCase(maSP)) {
+                productToUpdate = p;
+                break;
+            }
         }
+
+        if (productToUpdate == null) {
+            System.out.println("-> LỖI: Không tìm thấy sản phẩm có mã '" + maSP + "' trong kho!");
+            return;
+        }
+
+        System.out.println("-> Đã tìm thấy: " + productToUpdate.getName() + " | Tồn kho hiện tại: " + productToUpdate.getQuantity());
+        
+        int soLuongGiam = InputHelper.nhapSo(scanner, "Nhập số lượng muốn giảm bớt");
+
+        if (soLuongGiam > productToUpdate.getQuantity()) {
+            System.out.println("-> LỖI: Số lượng giảm vượt quá tồn kho hiện có (" + productToUpdate.getQuantity() + ")!");
+            return;
+        }
+
+        productToUpdate.setQuantity(productToUpdate.getQuantity() - soLuongGiam);
+        System.out.println("-> Cập nhật thành công! Tồn kho mới của '" + productToUpdate.getName() + "': " + productToUpdate.getQuantity());
+
+        FileManager.ghiFile(productList);
+        System.out.println("-> ĐÃ LƯU THAY ĐỔI VÀO TỆP!");
     }
 
     public void banHang(Scanner scanner) {
@@ -112,7 +165,7 @@ public class StoreManager {
 
         Product productToBuy = null;
         for (Product p : productList) {
-            if (p.getId().equals(maSP)) {
+            if (p.getId().equalsIgnoreCase(maSP)) {
                 productToBuy = p;
                 break;
             }
