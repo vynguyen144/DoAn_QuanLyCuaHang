@@ -27,45 +27,72 @@
 
 ```mermaid
 classDiagram
-    class StoreManager {
-        -ArrayList~Product~ productList
-        +themSanPham(scanner: Scanner)
-        +hienThiDanhSach()
-    }
-
+    direction LR
     class Product {
-        <<abstract>>
-        #String id
-        #String name
-        #int quantity
-        #int basePrice
-        +nhapThongTin(scanner: Scanner)
-        +xuatThongTin()
-        +calculateFinalPrice() double
+        # String id
+        # String name
+        # int quantity
+        # int basePrice
+        + calculateFinalPrice()* double
+        + xuatThongTin() void
+        + nhapThongTin(Scanner) void
     }
-
+    
     class Food {
-        -int expiryDays
-        +nhapThongTin(scanner: Scanner)
-        +xuatThongTin()
-        +calculateFinalPrice() double
+        - int expiryDays
+        + calculateFinalPrice() double
+        + xuatThongTin() void
     }
 
     class Electronics {
-        -int warrantyMonths
-        +nhapThongTin(scanner: Scanner)
-        +xuatThongTin()
-        +calculateFinalPrice() double
+        - int warrantyMonths
+        + calculateFinalPrice() double
+        + xuatThongTin() void
     }
 
     class Clothing {
-        -String size
-        +nhapThongTin(scanner: Scanner)
-        +xuatThongTin()
-        +calculateFinalPrice() double
+        - String size
+        + calculateFinalPrice() double
+        + xuatThongTin() void
     }
 
-    StoreManager o-- Product : Quản lý
-    Product <|-- Food : Kế thừa
-    Product <|-- Electronics : Kế thừa
-    Product <|-- Clothing : Kế thừa
+    Product <|-- Food
+    Product <|-- Electronics
+    Product <|-- Clothing
+
+    class StoreManager {
+        - ArrayList~Product~ productList
+        + themSanPham(Scanner) void
+        + hienThiDanhSach() void
+        + suaSanPham(Scanner) void
+        + giamSoLuongSanPham(Scanner) void
+        + banHang(Scanner) void
+    }
+
+    class Invoice {
+        - ArrayList~OrderItem~ items
+        + themMonHang(OrderItem) void
+        + inHoaDon() void
+    }
+
+    class OrderItem {
+        - Product product
+        - int quantity
+        + getThanhTien() double
+    }
+
+    class FileManager {
+        + static docFile() ArrayList~Product~
+        + static ghiFile(ArrayList~Product~) void
+    }
+
+    class InputHelper {
+        + static nhapSo(Scanner, String) int
+        + static nhapChuoi(Scanner, String) String
+    }
+
+    StoreManager --> Product : manages
+    Invoice --> OrderItem : contains
+    OrderItem --> Product : references
+    StoreManager ..> FileManager : uses
+    StoreManager ..> InputHelper : uses
