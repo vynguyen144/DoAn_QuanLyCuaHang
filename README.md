@@ -16,11 +16,10 @@
 
 ## Thông tin sinh viên
 * **Sinh viên thực hiện:**
-Nguyễn Thị Thanh Vy - NBS2503ITA0015
-Huỳnh Sĩ An Khang - NBS2503ITA0007
-Đỗ Quan Đạt - NBS2603ITA0012
-Nguyễn Hoàng Hữu Đức - NBS2503ITA0012
-* **Ngôn ngữ phát triển:** Java
+* Nguyễn Thị Thanh Vy - NBS2503ITA0015
+* Huỳnh Sĩ An Khang - NBS2503ITA0007
+* Đỗ Quan Đạt - NBS2603ITA0012
+* Nguyễn Hoàng Hữu Đức - NBS2503ITA0012
 - Ngôn ngữ phát triển: Java
 
 ## 📊 Sơ đồ thiết kế lớp (UML Class Diagram)
