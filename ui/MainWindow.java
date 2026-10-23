@@ -297,7 +297,7 @@ public class MainWindow extends JFrame {
             Path file = getSalesHistoryFile();
             if (!Files.exists(file)) return;
             for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
-                String[] parts = line.replace("\\\\t", "\\t").split("\\t", -1);
+                String[] parts = line.replace("\\t", "\t").split("\\t", -1);
                 if (parts.length != 6) continue;
                 try {
                     String name = new String(Base64.getDecoder().decode(parts[2]), StandardCharsets.UTF_8);
