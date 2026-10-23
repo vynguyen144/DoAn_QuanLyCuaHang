@@ -1,0 +1,41 @@
+name: Build Windows desktop app
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ feature/desktop-gui ]
+    paths:
+      - '**.java'
+      - 'pom.xml'
+      - '.github/workflows/build-windows.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/desktop-gui
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - name: Package application
+        run: mvn -B clean package
+      - name: Create portable app image
+        shell: pwsh
+        run: |
+          jpackage --type app-image --name QuanLyCuaHang --input target --main-jar QuanLyCuaHang.jar --main-class ui.DesktopApp --dest release
+          Compress-Archive -Path release/QuanLyCuaHang -DestinationPath release/QuanLyCuaHang-windows-x64.zip
+      - name: Upload portable application
+        uses: actions/upload-artifact@v4
+        with:
+          name: QuanLyCuaHang-windows-x64
+          path: release/QuanLyCuaHang-windows-x64.zip
+          if-no-files-found: error
