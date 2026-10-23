@@ -3,12 +3,10 @@ package utils;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 
 /**
- * Resolves the writable data location for the application.
- * User data is kept outside the application folder so packaged builds can
- * run from read-only locations and upgrades do not overwrite inventory.
+ * Resolves a writable location for user data, outside the application folder.
+ * Existing repository/test data is intentionally not imported into the desktop app.
  */
 public final class AppPaths {
     private static final String APP_FOLDER = "QuanLyCuaHang";
@@ -20,20 +18,7 @@ public final class AppPaths {
     public static Path getDataFile() throws IOException {
         Path dataDirectory = getDataDirectory();
         Files.createDirectories(dataDirectory);
-
-        Path destination = dataDirectory.resolve(DATA_FILE);
-        if (Files.exists(destination)) {
-            return destination;
-        }
-
-        // One-time migration for users running the old version from a folder
-        // containing store_data.txt. Never overwrite an existing destination.
-        Path legacyFile = Path.of(DATA_FILE).toAbsolutePath().normalize();
-        if (Files.isRegularFile(legacyFile) && !legacyFile.equals(destination)) {
-            Files.copy(legacyFile, destination, StandardCopyOption.COPY_ATTRIBUTES);
-        }
-
-        return destination;
+        return dataDirectory.resolve(DATA_FILE);
     }
 
     public static Path getDataDirectory() {
