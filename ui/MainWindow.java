@@ -75,9 +75,7 @@ public class MainWindow extends JFrame {
         add(main, BorderLayout.CENTER);
         refreshProducts();
         refreshDashboard();
-        try {
-            setTitle("Quản lý cửa hàng  •  Dữ liệu: " + AppPaths.getDataDirectory());
-        } catch (IOException ignored) { }
+        setTitle("Quản lý cửa hàng  •  Dữ liệu: " + AppPaths.getDataDirectory());
     }
 
     private JPanel buildSidebar() {
