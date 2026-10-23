@@ -315,7 +315,7 @@ public class MainWindow extends JFrame {
         String encodedName = Base64.getEncoder().encodeToString(product.getName().getBytes(StandardCharsets.UTF_8));
         String[] sale = {time, product.getId(), product.getName(), Integer.toString(quantity),
                 Long.toString(unitPrice), Long.toString(amount)};
-        String line = String.join("\\t", time, product.getId(), encodedName,
+        String line = String.join("\t", time, product.getId(), encodedName,
                 Integer.toString(quantity), Long.toString(unitPrice), Long.toString(amount)) + System.lineSeparator();
         Files.writeString(getSalesHistoryFile(), line, StandardCharsets.UTF_8,
                 StandardOpenOption.CREATE, StandardOpenOption.APPEND);
