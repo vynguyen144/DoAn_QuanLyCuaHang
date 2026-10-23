@@ -96,3 +96,27 @@ classDiagram
     OrderItem --> Product : references
     StoreManager ..> FileManager : uses
     StoreManager ..> InputHelper : uses
+
+
+## Ứng dụng desktop Windows
+
+Nhánh `feature/desktop-gui` đang phát triển giao diện desktop bằng Java Swing và FlatLaf.
+
+### Tạo bản chạy thử
+
+1. Mở tab **Actions** của repository trên GitHub.
+2. Chọn workflow **Build Windows desktop app**.
+3. Nếu workflow chưa tự chạy, chọn **Run workflow** trên nhánh `feature/desktop-gui`.
+4. Khi chạy thành công, mở lần chạy đó và tải artifact `QuanLyCuaHang-windows-x64` ở mục **Artifacts**.
+5. Giải nén ZIP rồi mở `QuanLyCuaHang.exe` bên trong thư mục `QuanLyCuaHang`.
+
+Gói này là thư mục ứng dụng portable, gồm launcher và Java runtime đi kèm; không cần cài Java riêng. Bản Windows được đóng gói trên Windows thông qua `jpackage`. Xem [tài liệu jpackage của Oracle](https://docs.oracle.com/en/java/javase/21/docs/specs/man/jpackage.html).
+
+### Dữ liệu
+
+Dữ liệu của bản desktop được lưu riêng, không tự nhập file `store_data.txt` dùng để test trong repository:
+
+- Windows: `%LOCALAPPDATA%\\QuanLyCuaHang\\store_data.txt`
+- Các hệ điều hành khác khi chạy trực tiếp: `~/.local/share/QuanLyCuaHang/store_data.txt`
+
+Khi cập nhật phiên bản ứng dụng, file dữ liệu trong thư mục trên không bị ghi đè bởi bản build mới.
