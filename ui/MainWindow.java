@@ -51,6 +51,7 @@ public class MainWindow extends JFrame {
     public MainWindow() {
         super("Quản lý cửa hàng");
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setIconImage(createAppIcon());
         setMinimumSize(new Dimension(1050, 680));
         setSize(1200, 760);
         setLocationRelativeTo(null);
@@ -91,6 +92,23 @@ public class MainWindow extends JFrame {
         refreshDashboard();
         refreshSalesHistory();
         setTitle("Quản lý cửa hàng  •  Dữ liệu: " + AppPaths.getDataDirectory());
+    }
+
+
+    private static Image createAppIcon() {
+        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(128, 128, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = image.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setColor(new Color(12, 29, 72)); g.fillRoundRect(2, 2, 124, 124, 28, 28);
+        g.setColor(new Color(23, 190, 190)); g.fillRoundRect(25, 24, 78, 12, 8, 8);
+        int[] xs = {20, 108, 98, 30}; int[] ys = {43, 43, 59, 59};
+        g.setColor(new Color(255, 174, 54)); g.fillPolygon(xs, ys, 4);
+        g.setColor(new Color(255, 244, 220)); g.fillRoundRect(31, 57, 66, 45, 5, 5);
+        g.setColor(new Color(12, 29, 72)); g.fillRoundRect(40, 68, 22, 34, 4, 4);
+        g.setColor(new Color(23, 190, 190)); g.fillRoundRect(70, 68, 17, 17, 4, 4);
+        g.setColor(new Color(255, 153, 35)); g.fillRoundRect(56, 83, 38, 29, 5, 5);
+        g.setColor(new Color(255, 215, 117)); g.fillRect(72, 83, 6, 29);
+        g.dispose(); return image;
     }
 
     private JPanel buildSidebar() {
