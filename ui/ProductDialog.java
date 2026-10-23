@@ -22,7 +22,7 @@ final class ProductDialog {
         JSpinner price = new JSpinner(new SpinnerNumberModel(existing == null ? 0 : existing.getBasePrice(), 0, Integer.MAX_VALUE, 1000));
         JTextField extraText = new JTextField(20);
         JSpinner extraNumber = new JSpinner(new SpinnerNumberModel(0, 0, 100_000, 1));
-        JLabel extraLabel = new JLabel("Thông tin thêm");
+        JLabel extraRowLabel = new JLabel("Số ngày còn hạn");
         boolean editing = existing != null;
         if (existing instanceof Food) {
             type.setSelectedIndex(0); extraNumber.setValue(((Food) existing).getExpiryDays());
@@ -45,12 +45,12 @@ final class ProductDialog {
         addRow(fields, c, 4, "Giá gốc (VNĐ)", price);
         JPanel extraHolder = new JPanel(new BorderLayout());
         extraHolder.add(extraNumber, BorderLayout.CENTER);
-        updateExtra(type, extraLabel, extraNumber, extraText);
+        updateExtra(type, extraRowLabel);
         JPanel dynamic = new JPanel(new BorderLayout(8, 0));
         dynamic.add(extraNumber, BorderLayout.CENTER);
-        addRow(fields, c, 5, extraLabel.getText(), dynamic);
+        addRow(fields, c, 5, extraRowLabel.getText(), dynamic);
         type.addActionListener(e -> {
-            updateExtra(type, extraLabel, extraNumber, extraText);
+            updateExtra(type, extraRowLabel);
             dynamic.removeAll();
             dynamic.add(type.getSelectedIndex() == 2 ? extraText : extraNumber, BorderLayout.CENTER);
             fields.getComponent(5); // Keep the row in place; update its label below.
