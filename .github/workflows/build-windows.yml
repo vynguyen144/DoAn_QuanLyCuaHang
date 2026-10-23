@@ -31,6 +31,7 @@ jobs:
       - name: Create portable app image
         shell: pwsh
         run: |
+          New-Item -ItemType Directory -Force release | Out-Null
           Add-Type -AssemblyName System.Drawing
           $bmp = New-Object System.Drawing.Bitmap 256, 256
           $g = [System.Drawing.Graphics]::FromImage($bmp)
