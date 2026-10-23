@@ -1,98 +1,179 @@
-# Đồ Án Lập Trình Hướng Đối Tượng: Quản Lý Cửa Hàng Bán Lẻ
+# ĐỒ ÁN LẬP TRÌNH HƯỚNG ĐỐI TƯỢNG
+## QUẢN LÝ CỬA HÀNG BÁN LẺ
 
-## Giới thiệu
-Đây là dự án phần mềm quản lý kho hàng cho một cửa hàng bán lẻ tổng hợp. Chương trình được xây dựng bằng ngôn ngữ **Java**, áp dụng chặt chẽ các nguyên lý của Lập trình Hướng đối tượng (OOP) để giải quyết bài toán quản lý nhiều danh mục sản phẩm khác nhau.
+Ứng dụng quản lý cửa hàng bán lẻ được xây dựng bằng **Java**, áp dụng các nguyên lý **lập trình hướng đối tượng (OOP)** nhằm hỗ trợ quản lý sản phẩm, theo dõi số lượng tồn kho và ghi nhận hoạt động bán hàng.
+Dự án gồm phiên bản giao diện dòng lệnh và phiên bản ứng dụng desktop sử dụng **Java Swing** cùng thư viện **FlatLaf**, giúp người dùng thao tác trực quan và thuận tiện hơn.
 
-## Các tính năng nổi bật
-* **Thêm mới sản phẩm đa hình:** Hỗ trợ nhập liệu cho Thực phẩm, Đồ điện tử và Quần áo với các thuộc tính chuyên biệt.
-* **Xử lý ngoại lệ an toàn:** Hệ thống chặn lỗi nhập sai kiểu dữ liệu (nhập chữ vào ô số) và chặn số âm, đảm bảo chương trình hoạt động liên tục không bị gián đoạn (crash).
-* **Tính toán giá động:** Tự động tính giá bán thực tế dựa trên logic riêng của từng loại mặt hàng (Ví dụ: Giảm 50% cho thực phẩm cận date, cộng 5% phí bảo hành cho đồ điện tử).
+## Giới thiệu đồ án
 
-## 4 Tính chất OOP được áp dụng
-1. **Đóng gói (Encapsulation):** Bảo vệ dữ liệu nội bộ của các lớp bằng Access Modifier (`private`, `protected`) và tương tác qua các phương thức an toàn.
-2. **Kế thừa (Inheritance):** Các lớp `Food`, `Electronics`, `Clothing` kế thừa toàn bộ thuộc tính cơ sở từ lớp cha `Product`.
-3. **Đa hình (Polymorphism):** Cài đặt ghi đè (Overriding) phương thức `calculateFinalPrice()` và `xuatThongTin()` cho từng lớp con. Quản lý chung bằng một danh sách `ArrayList<Product>`.
-4. **Trừu tượng (Abstraction):** Sử dụng lớp trừu tượng `Product` chứa phương thức thuần ảo để làm khuôn mẫu chuẩn cho các danh mục sản phẩm.
+Mục tiêu của đồ án là vận dụng kiến thức lập trình hướng đối tượng vào việc xây dựng một chương trình quản lý cửa hàng bán lẻ. Thông qua dự án, nhóm thực hành thiết kế lớp, tổ chức dữ liệu, xử lý nghiệp vụ và xây dựng giao diện người dùng.
+Ứng dụng hỗ trợ quản lý nhiều nhóm sản phẩm khác nhau, mỗi nhóm có các thuộc tính và quy tắc tính giá riêng.
+
+## Chức năng chính
+
+- **Quản lý sản phẩm:** Thêm, chỉnh sửa, xóa và theo dõi danh sách sản phẩm.
+- **Phân loại sản phẩm:** Hỗ trợ các nhóm Thực phẩm, Đồ điện tử và Quần áo.
+- **Quản lý tồn kho:** Theo dõi số lượng sản phẩm và cập nhật số lượng khi bán hàng.
+- **Tính giá bán tự động:** Áp dụng quy tắc tính giá riêng cho từng loại sản phẩm.
+- **Xử lý dữ liệu đầu vào:** Kiểm tra dữ liệu nhập, hạn chế lỗi sai kiểu dữ liệu và số lượng không hợp lệ.
+- **Lưu trữ dữ liệu:** Đọc và ghi dữ liệu sản phẩm để sử dụng lại khi mở chương trình.
+- **Giao diện desktop:** Cung cấp các trang tổng quan, quản lý sản phẩm và bán hàng.
+
+## Công nghệ sử dụng
+
+| Công nghệ | Mục đích |
+|---|---|
+| Java | Ngôn ngữ lập trình chính |
+| OOP | Tổ chức chương trình theo hướng đối tượng |
+| Java Swing | Xây dựng giao diện desktop |
+| FlatLaf | Tùy chỉnh giao diện ứng dụng Java Swing |
+| Maven | Quản lý thư viện và cấu hình dự án |
+| GitHub Actions | Tự động xây dựng bản ứng dụng Windows |
+
+## Các nguyên lý lập trình hướng đối tượng
+
+1. **Đóng gói (Encapsulation):** Kiểm soát quyền truy cập dữ liệu và thao tác thông qua các phương thức của lớp.
+2. **Kế thừa (Inheritance):** Các lớp `Food`, `Electronics` và `Clothing` kế thừa từ lớp `Product`.
+3. **Đa hình (Polymorphism):** Các lớp sản phẩm triển khai cách tính giá và hiển thị thông tin phù hợp với từng loại.
+4. **Trừu tượng (Abstraction):** Lớp `Product` định nghĩa khuôn mẫu chung cho các nhóm sản phẩm.
 
 ## Thông tin sinh viên
-* **Sinh viên thực hiện:**
-* Nguyễn Thị Thanh Vy - NBS2503ITA0015
-* Huỳnh Sĩ An Khang - NBS2503ITA0007
-* Đỗ Quan Đạt - NBS2603ITA0012
-* Nguyễn Hoàng Hữu Đức - NBS2503ITA0012
-  
-**Ngôn ngữ phát triển: Java**
 
-## 📊 Sơ đồ thiết kế lớp (UML Class Diagram)
+**Sinh viên thực hiện:**
+
+| STT | Họ và tên | Mã sinh viên |
+|---:|---|---|
+| 1 | Nguyễn Thị Thanh Vy | NBS2503ITA0015 |
+| 2 | Huỳnh Sĩ An Khang | NBS2503ITA0007 |
+| 3 | Đỗ Quan Đạt | NBS2603ITA0012 |
+| 4 | Nguyễn Hoàng Hữu Đức | NBS2503ITA0012 |
+
+**Ngôn ngữ phát triển:** Java
+
+---
+  
+## Sơ đồ UML
+
+### 1. Sơ đồ lớp nghiệp vụ
 
 ```mermaid
 classDiagram
-    direction LR
+    direction TB
+
     class Product {
-        # String id
-        # String name
-        # int quantity
-        # int basePrice
-        + calculateFinalPrice()* double
-        + xuatThongTin() void
-        + nhapThongTin(Scanner) void
+        #String id
+        #String name
+        #int quantity
+        #int basePrice
+        +calculateFinalPrice() double
+        +xuatThongTin() void
+        +nhapThongTin(Scanner) void
     }
-    
+
     class Food {
-        - int expiryDays
-        + calculateFinalPrice() double
-        + xuatThongTin() void
+        -int expiryDays
+        +calculateFinalPrice() double
+        +xuatThongTin() void
     }
 
     class Electronics {
-        - int warrantyMonths
-        + calculateFinalPrice() double
-        + xuatThongTin() void
+        -int warrantyMonths
+        +calculateFinalPrice() double
+        +xuatThongTin() void
     }
 
     class Clothing {
-        - String size
-        + calculateFinalPrice() double
-        + xuatThongTin() void
+        -String size
+        +calculateFinalPrice() double
+        +xuatThongTin() void
+    }
+
+    class StoreManager {
+        -ArrayList~Product~ productList
+    }
+
+    class FileManager {
+        +docFile() ArrayList~Product~
+        +ghiFile(ArrayList~Product~) void
+    }
+
+    class AppPaths {
+        +getDataDirectory() Path
+    }
+
+    class Main {
+        +main(String[] args) void
     }
 
     Product <|-- Food
     Product <|-- Electronics
     Product <|-- Clothing
 
-    class StoreManager {
-        - ArrayList~Product~ productList
-        + themSanPham(Scanner) void
-        + hienThiDanhSach() void
-        + suaSanPham(Scanner) void
-        + giamSoLuongSanPham(Scanner) void
-        + banHang(Scanner) void
+    StoreManager --> Product : quan ly
+    StoreManager ..> FileManager : doc ghi du lieu
+    Main ..> StoreManager : khoi chay
+    FileManager ..> AppPaths : xac dinh thu muc du lieu
+```
+----------
+
+### 2. Sơ đồ lớp giao diện desktop
+
+```mermaid
+classDiagram
+    direction TB
+
+    class DesktopApp {
+        +main(String[] args) void
     }
 
-    class Invoice {
-        - ArrayList~OrderItem~ items
-        + themMonHang(OrderItem) void
-        + inHoaDon() void
+    class MainWindow {
+        -ArrayList~Product~ products
+        -CardLayout cardLayout
+        -JTable table
+        -List~String[]~ salesHistory
+        +MainWindow()
+        -buildSidebar() JPanel
+        -buildDashboard() JPanel
+        -buildProductsPage() JPanel
+        -buildSalesPage() JPanel
+        -refreshProducts() void
+        -refreshDashboard() void
+        -refreshSalesHistory() void
+        -addProduct() void
+        -editSelected() void
+        -deleteSelected() void
+        -sellSelected() void
+        -loadSalesHistory() void
+        -appendSale(Product, int, long, long) void
     }
 
-    class OrderItem {
-        - Product product
-        - int quantity
-        + getThanhTien() double
+    class ProductDialog {
+        +show(Component, Product) Result
+    }
+
+    class Result {
+        +Product product
+    }
+
+    class Product {
+        +calculateFinalPrice() double
     }
 
     class FileManager {
-        + static docFile() ArrayList~Product~
-        + static ghiFile(ArrayList~Product~) void
+        +docFile() ArrayList~Product~
+        +ghiFile(ArrayList~Product~) void
     }
 
-    class InputHelper {
-        + static nhapSo(Scanner, String) int
-        + static nhapChuoi(Scanner, String) String
+    class AppPaths {
+        +getDataDirectory() Path
     }
 
-    StoreManager --> Product : manages
-    Invoice --> OrderItem : contains
-    OrderItem --> Product : references
-    StoreManager ..> FileManager : uses
-    StoreManager ..> InputHelper : uses
+    DesktopApp ..> MainWindow : khoi chay
+    MainWindow ..> ProductDialog : them va sua san pham
+    ProductDialog ..> Product : tao hoac cap nhat
+    MainWindow --> Product : quan ly danh sach
+    MainWindow ..> FileManager : luu va tai san pham
+    MainWindow ..> AppPaths : xac dinh noi luu du lieu
+```
+
+
