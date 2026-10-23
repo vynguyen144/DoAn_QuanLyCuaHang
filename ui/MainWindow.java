@@ -12,6 +12,13 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardOpenOption;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Base64;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Locale;
@@ -34,6 +41,12 @@ public class MainWindow extends JFrame {
     };
     private final JTable table = new JTable(tableModel);
     private JTextField searchField;
+    private final java.util.List<String[]> salesHistory = new ArrayList<>();
+    private final DefaultTableModel salesTableModel = new DefaultTableModel(
+            new Object[]{"Thời gian", "Mã SP", "Tên sản phẩm", "Số lượng", "Đơn giá", "Thành tiền"}, 0) {
+        @Override public boolean isCellEditable(int row, int column) { return false; }
+    };
+    private JTable salesTable;
 
     public MainWindow() {
         super("Quản lý cửa hàng");
@@ -73,8 +86,10 @@ public class MainWindow extends JFrame {
         pages.add(buildSalesPage(), "sales");
         main.add(pages, BorderLayout.CENTER);
         add(main, BorderLayout.CENTER);
+        loadSalesHistory();
         refreshProducts();
         refreshDashboard();
+        refreshSalesHistory();
         setTitle("Quản lý cửa hàng  •  Dữ liệu: " + AppPaths.getDataDirectory());
     }
 
@@ -121,6 +136,7 @@ public class MainWindow extends JFrame {
             cardLayout.show(pages, page);
             if (page.equals("products")) refreshProducts();
             if (page.equals("dashboard")) refreshDashboard();
+            if (page.equals("sales")) refreshSalesHistory();
         });
         return button;
     }
@@ -223,24 +239,87 @@ public class MainWindow extends JFrame {
     }
 
     private JPanel buildSalesPage() {
-        JPanel panel = new JPanel(new GridBagLayout());
+        JPanel panel = new JPanel(new BorderLayout(0, 14));
         panel.setOpaque(false);
-        JPanel box = new JPanel();
-        box.setBackground(Color.WHITE);
-        box.setBorder(new EmptyBorder(28, 32, 28, 32));
-        box.setLayout(new BoxLayout(box, BoxLayout.Y_AXIS));
-        JLabel title = new JLabel("Tạo giao dịch bán hàng");
-        title.setFont(new Font("SansSerif", Font.BOLD, 21));
-        title.setForeground(navy);
-        JLabel desc = new JLabel("<html><div style='width:430px'>Chọn một sản phẩm trong danh sách, sau đó bấm “Bán sản phẩm”. Hệ thống sẽ kiểm tra tồn kho và tự động lưu số lượng mới.</div></html>");
-        desc.setForeground(new Color(105, 116, 136));
-        JButton go = new JButton("Đến danh sách sản phẩm");
-        go.setBackground(blue); go.setForeground(Color.WHITE);
-        go.addActionListener(e -> { pageTitle.setText("Quản lý sản phẩm"); cardLayout.show(pages, "products"); refreshProducts(); });
-        box.add(title); box.add(Box.createVerticalStrut(12)); box.add(desc);
-        box.add(Box.createVerticalStrut(20)); box.add(go);
-        panel.add(box);
+
+        JPanel toolbar = new JPanel(new BorderLayout());
+        toolbar.setOpaque(false);
+        JLabel heading = new JLabel("Lịch sử giao dịch");
+        heading.setFont(new Font("SansSerif", Font.BOLD, 17));
+        heading.setForeground(navy);
+        JButton sell = new JButton("+ Tạo giao dịch bán hàng");
+        sell.setBackground(blue);
+        sell.setForeground(Color.WHITE);
+        sell.addActionListener(e -> {
+            pageTitle.setText("Quản lý sản phẩm");
+            cardLayout.show(pages, "products");
+            refreshProducts();
+            JOptionPane.showMessageDialog(this,
+                    "Chọn sản phẩm trong bảng rồi bấm “Bán sản phẩm” để tạo giao dịch.",
+                    "Tạo giao dịch", JOptionPane.INFORMATION_MESSAGE);
+        });
+        toolbar.add(heading, BorderLayout.WEST);
+        toolbar.add(sell, BorderLayout.EAST);
+
+        salesTable = new JTable(salesTableModel);
+        salesTable.setRowHeight(36);
+        salesTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        salesTable.setShowVerticalLines(false);
+        salesTable.setGridColor(new Color(235, 238, 244));
+        salesTable.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 12));
+        salesTable.getTableHeader().setBackground(new Color(238, 242, 249));
+        JScrollPane scroll = new JScrollPane(salesTable);
+        scroll.setBorder(BorderFactory.createLineBorder(new Color(230, 234, 242)));
+
+        JLabel note = new JLabel("Các giao dịch bán hàng được lưu trên máy này.");
+        note.setForeground(new Color(115, 125, 145));
+        panel.add(toolbar, BorderLayout.NORTH);
+        panel.add(scroll, BorderLayout.CENTER);
+        panel.add(note, BorderLayout.SOUTH);
         return panel;
+    }
+
+    private void refreshSalesHistory() {
+        salesTableModel.setRowCount(0);
+        for (int i = salesHistory.size() - 1; i >= 0; i--) {
+            String[] sale = salesHistory.get(i);
+            salesTableModel.addRow(new Object[]{sale[0], sale[1], sale[2], sale[3],
+                    money(Long.parseLong(sale[4])), money(Long.parseLong(sale[5]))});
+        }
+    }
+
+    private Path getSalesHistoryFile() throws IOException {
+        return AppPaths.getDataDirectory().resolve("sales_history.tsv");
+    }
+
+    private void loadSalesHistory() {
+        try {
+            Path file = getSalesHistoryFile();
+            if (!Files.exists(file)) return;
+            for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
+                String[] parts = line.split("\\t", -1);
+                if (parts.length != 6) continue;
+                try {
+                    String name = new String(Base64.getDecoder().decode(parts[2]), StandardCharsets.UTF_8);
+                    salesHistory.add(new String[]{parts[0], parts[1], name, parts[3], parts[4], parts[5]});
+                } catch (IllegalArgumentException ignored) { }
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Không đọc được lịch sử bán hàng: " + ex.getMessage(),
+                    "Lỗi dữ liệu", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void appendSale(Product product, int quantity, long unitPrice, long amount) throws IOException {
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+        String encodedName = Base64.getEncoder().encodeToString(product.getName().getBytes(StandardCharsets.UTF_8));
+        String[] sale = {time, product.getId(), product.getName(), Integer.toString(quantity),
+                Long.toString(unitPrice), Long.toString(amount)};
+        String line = String.join("\\t", time, product.getId(), encodedName,
+                Integer.toString(quantity), Long.toString(unitPrice), Long.toString(amount)) + System.lineSeparator();
+        Files.writeString(getSalesHistoryFile(), line, StandardCharsets.UTF_8,
+                StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        salesHistory.add(sale);
     }
 
     private void refreshProducts() {
@@ -321,15 +400,20 @@ public class MainWindow extends JFrame {
                 JOptionPane.showMessageDialog(this, "Số lượng phải lớn hơn 0 và không vượt quá tồn kho.");
                 return;
             }
-            long amount = (long) product.calculateFinalPrice() * quantity;
+            long unitPrice = (long) product.calculateFinalPrice();
+            long amount = unitPrice * quantity;
+            appendSale(product, quantity, unitPrice, amount);
             product.setQuantity(product.getQuantity() - quantity);
             saveAndRefresh();
+            refreshSalesHistory();
             JOptionPane.showMessageDialog(this,
                     "BÁN HÀNG THÀNH CÔNG\n\n" + product.getName() + " × " + quantity
                             + "\nTổng thanh toán: " + money(amount),
                     "Hóa đơn bán hàng", JOptionPane.INFORMATION_MESSAGE);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập số nguyên hợp lệ.");
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Không thể lưu giao dịch: " + ex.getMessage(), "Lỗi lưu dữ liệu", JOptionPane.ERROR_MESSAGE);
         }
     }
 
