@@ -24,9 +24,9 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class MainWindow extends JFrame {
-    private final Color navy = new Color(25, 39, 67);
-    private final Color blue = new Color(57, 105, 220);
-    private final Color background = new Color(245, 247, 251);
+    private final Color navy = new Color(112, 73, 91);
+    private final Color blue = new Color(222, 126, 164);
+    private final Color background = new Color(255, 247, 250);
     private final ArrayList<Product> products = FileManager.docFile();
     private final CardLayout cardLayout = new CardLayout();
     private final JPanel pages = new JPanel(cardLayout);
@@ -66,7 +66,7 @@ public class MainWindow extends JFrame {
         pageTitle.setFont(new Font("SansSerif", Font.BOLD, 25));
         pageTitle.setForeground(navy);
         JLabel subtitle = new JLabel("Quản lý hàng hóa và hoạt động bán hàng");
-        subtitle.setForeground(new Color(115, 125, 145));
+        subtitle.setForeground(new Color(143, 116, 130));
         JPanel titleStack = new JPanel();
         titleStack.setOpaque(false);
         titleStack.setLayout(new BoxLayout(titleStack, BoxLayout.Y_AXIS));
@@ -123,7 +123,7 @@ public class MainWindow extends JFrame {
         brand.setBorder(new EmptyBorder(0, 0, 30, 0));
         side.add(brand);
         JLabel group = new JLabel("  KHÔNG GIAN LÀM VIỆC");
-        group.setForeground(new Color(155, 170, 197));
+        group.setForeground(new Color(235, 199, 216));
         group.setFont(new Font("SansSerif", Font.BOLD, 10));
         group.setBorder(new EmptyBorder(0, 0, 12, 0));
         side.add(group);
@@ -146,7 +146,7 @@ public class MainWindow extends JFrame {
         button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 44));
         button.setPreferredSize(new Dimension(195, 44));
         button.setBackground(navy);
-        button.setForeground(new Color(225, 232, 244));
+        button.setForeground(new Color(255, 239, 246));
         button.setBorder(new EmptyBorder(10, 12, 10, 10));
         button.setFocusPainted(false);
         button.addActionListener(e -> {
@@ -171,13 +171,13 @@ public class MainWindow extends JFrame {
         JPanel welcome = new JPanel(new BorderLayout(10, 12));
         welcome.setBackground(Color.WHITE);
         welcome.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(new Color(230, 234, 242)),
+                BorderFactory.createLineBorder(new Color(243, 220, 231)),
                 new EmptyBorder(24, 24, 24, 24)));
         JLabel heading = new JLabel("Chào mừng đến với Store Desk");
         heading.setFont(new Font("SansSerif", Font.BOLD, 22));
         heading.setForeground(navy);
         JLabel description = new JLabel("<html><div style='width:600px'>Theo dõi kho hàng, cập nhật thông tin sản phẩm và tạo giao dịch bán hàng trong một giao diện gọn gàng. Dữ liệu sẽ được lưu tự động trên máy tính này.</div></html>");
-        description.setForeground(new Color(100, 112, 132));
+        description.setForeground(new Color(133, 105, 120));
         JPanel words = new JPanel();
         words.setOpaque(false);
         words.setLayout(new BoxLayout(words, BoxLayout.Y_AXIS));
@@ -208,7 +208,7 @@ public class MainWindow extends JFrame {
         value.setFont(new Font("SansSerif", Font.BOLD, 25));
         value.setForeground(navy);
         JLabel hint = new JLabel(note);
-        hint.setForeground(new Color(140, 149, 166));
+        hint.setForeground(new Color(174, 143, 159));
         hint.setFont(new Font("SansSerif", Font.PLAIN, 11));
         card.add(label); card.add(Box.createVerticalStrut(12)); card.add(value);
         card.add(Box.createVerticalStrut(6)); card.add(hint);
@@ -235,9 +235,9 @@ public class MainWindow extends JFrame {
         table.setRowHeight(38);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setShowVerticalLines(false);
-        table.setGridColor(new Color(235, 238, 244));
+        table.setGridColor(new Color(245, 226, 235));
         table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 12));
-        table.getTableHeader().setBackground(new Color(238, 242, 249));
+        table.getTableHeader().setBackground(new Color(255, 232, 241));
         JScrollPane scroll = new JScrollPane(table);
         scroll.setBorder(BorderFactory.createLineBorder(new Color(230, 234, 242)));
         JPanel actions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
