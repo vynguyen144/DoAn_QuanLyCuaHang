@@ -226,13 +226,13 @@ public class MainWindow extends JFrame {
             }
         }
 
-        String report = "THỐNG KÊ CỬA HÀNG\\n\\n"
-                + "Số loại sản phẩm: " + productKinds + "\\n"
-                + "Tổng số lượng tồn: " + units + "\\n"
-                + "Sản phẩm sắp hết (≤ 5): " + low + "\\n"
-                + "Sản phẩm hết hàng: " + out + "\\n"
-                + "Giá trị tồn kho theo giá bán: " + money(stockValue) + "\\n\\n"
-                + "Tổng số lượng đã bán (lịch sử): " + soldUnits + "\\n"
+        String report = "THỐNG KÊ CỬA HÀNG\n\n"
+                + "Số loại sản phẩm: " + productKinds + "\n"
+                + "Tổng số lượng tồn: " + units + "\n"
+                + "Sản phẩm sắp hết (≤ 5): " + low + "\n"
+                + "Sản phẩm hết hàng: " + out + "\n"
+                + "Giá trị tồn kho theo giá bán: " + money(stockValue) + "\n\n"
+                + "Tổng số lượng đã bán (lịch sử): " + soldUnits + "\n"
                 + "Tổng doanh thu ghi nhận: " + money(revenue);
         JOptionPane.showMessageDialog(this, report, "Thống kê", JOptionPane.INFORMATION_MESSAGE);
     }
@@ -492,7 +492,7 @@ public class MainWindow extends JFrame {
         String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
         String name = Base64.getEncoder().encodeToString(product.getName().getBytes(StandardCharsets.UTF_8));
         String vendor = Base64.getEncoder().encodeToString(supplier.getBytes(StandardCharsets.UTF_8));
-        String line = String.join("\\t", time, product.getId(), name, Integer.toString(quantity), vendor)
+        String line = String.join("\t", time, product.getId(), name, Integer.toString(quantity), vendor)
                 + System.lineSeparator();
         Files.writeString(file, line, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
