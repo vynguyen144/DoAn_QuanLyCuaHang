@@ -55,7 +55,7 @@ public final class FileManager {
                     extra = encode(((Clothing) product).getSize() == null ? "" : ((Clothing) product).getSize());
                 }
 
-                lines.add(String.join("\\t",
+                lines.add(String.join("\t",
                         FORMAT_MARKER,
                         type,
                         encode(product.getId() == null ? "" : product.getId()),
