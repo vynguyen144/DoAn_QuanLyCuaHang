@@ -443,16 +443,25 @@ public class MainWindow extends JFrame {
 
     private void refreshDashboard() {
         totalProducts.setText(Integer.toString(products.size()));
-        int units = 0, low = 0;
+        long units = 0;
+        int low = 0;
         long value = 0;
+        boolean valueOverflow = false;
         for (Product p : products) {
             units += p.getQuantity();
             if (p.getQuantity() <= 5) low++;
-            value += (long) p.calculateFinalPrice() * p.getQuantity();
+            if (!valueOverflow) {
+                try {
+                    long productValue = Math.multiplyExact((long) p.calculateFinalPrice(), (long) p.getQuantity());
+                    value = Math.addExact(value, productValue);
+                } catch (ArithmeticException ex) {
+                    valueOverflow = true;
+                }
+            }
         }
-        totalUnits.setText(Integer.toString(units));
+        totalUnits.setText(Long.toString(units));
         lowStock.setText(Integer.toString(low));
-        totalValue.setText(money(value));
+        totalValue.setText(valueOverflow ? "Vượt giới hạn" : money(value));
     }
 
     private void addProduct() {
