@@ -23,7 +23,7 @@ import java.util.List;
  * Legacy comma-separated rows are still accepted for backward compatibility.
  */
 public final class FileManager {
-    private static final String FORMAT_MARKER = "V2";
+    private static final String FORMAT_MARKER = "V3";
 
     private FileManager() {
     }
@@ -58,7 +58,8 @@ public final class FileManager {
                         encode(product.getName() == null ? "" : product.getName()),
                         Integer.toString(product.getQuantity()),
                         Integer.toString(product.getBasePrice()),
-                        extra));
+                        extra,
+                        product.getReceivedDate() == null ? java.time.LocalDate.now().toString() : product.getReceivedDate().toString()));
             }
 
             Files.write(temporaryFile, lines, StandardCharsets.UTF_8);
@@ -100,7 +101,7 @@ public final class FileManager {
                 try {
                     Product product = line.startsWith(FORMAT_MARKER + "\t")
                             ? parseCurrentFormat(line)
-                            : parseLegacyFormat(line);
+                            : line.startsWith("V2\t") ? parseV2Format(line) : parseLegacyFormat(line);
                     if (product != null) {
                         productList.add(product);
                     }
@@ -118,8 +119,8 @@ public final class FileManager {
 
     private static Product parseCurrentFormat(String line) {
         String[] parts = line.split("\\t", -1);
-        if (parts.length != 7 || !FORMAT_MARKER.equals(parts[0])) {
-            throw new IllegalArgumentException("Sai số lượng trường ở định dạng V2");
+        if (parts.length != 8 || !FORMAT_MARKER.equals(parts[0])) {
+            throw new IllegalArgumentException("Sai số lượng trường ở định dạng V3");
         }
 
         Product product = createProduct(parts[1]);
@@ -139,6 +140,26 @@ public final class FileManager {
         } else if (product instanceof Clothing) {
             ((Clothing) product).setSize(decode(parts[6]));
         }
+        return product;
+    }
+
+        product.setReceivedDate(java.time.LocalDate.parse(parts[7]));
+        return product;
+    }
+
+    private static Product parseV2Format(String line) {
+        String[] parts = line.split("\\\\t", -1);
+        if (parts.length != 7 || !"V2".equals(parts[0])) throw new IllegalArgumentException("Sai số lượng trường ở định dạng V2");
+        Product product = createProduct(parts[1]);
+        if (product == null) return null;
+        product.setId(decode(parts[2]));
+        product.setName(decode(parts[3]));
+        product.setQuantity(Integer.parseInt(parts[4]));
+        product.setBasePrice(Integer.parseInt(parts[5]));
+        if (product instanceof Food) ((Food) product).setExpiryDays(Integer.parseInt(parts[6]));
+        else if (product instanceof Electronics) ((Electronics) product).setWarrantyMonths(Integer.parseInt(parts[6]));
+        else if (product instanceof Clothing) ((Clothing) product).setSize(decode(parts[6]));
+        product.setReceivedDate(java.time.LocalDate.now());
         return product;
     }
 
