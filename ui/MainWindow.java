@@ -189,11 +189,52 @@ public class MainWindow extends JFrame {
         view.setBackground(blue);
         view.setForeground(Color.WHITE);
         view.addActionListener(e -> { pageTitle.setText("Quản lý sản phẩm"); cardLayout.show(pages, "products"); refreshProducts(); });
+        JButton statistics = new JButton("Xem thống kê");
+        statistics.addActionListener(e -> showStatistics());
+        JPanel welcomeActions = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
+        welcomeActions.setOpaque(false);
+        welcomeActions.add(view);
+        welcomeActions.add(statistics);
         welcome.add(words, BorderLayout.CENTER);
-        welcome.add(view, BorderLayout.SOUTH);
+        welcome.add(welcomeActions, BorderLayout.SOUTH);
         panel.add(cards, BorderLayout.NORTH);
         panel.add(welcome, BorderLayout.CENTER);
         return panel;
+    }
+
+    private void showStatistics() {
+        int productKinds = products.size();
+        int units = 0;
+        int low = 0;
+        int out = 0;
+        long stockValue = 0;
+        for (Product p : products) {
+            units += p.getQuantity();
+            if (p.getQuantity() <= 5) low++;
+            if (p.getQuantity() <= 0) out++;
+            stockValue += (long) p.calculateFinalPrice() * p.getQuantity();
+        }
+
+        long revenue = 0;
+        long soldUnits = 0;
+        for (String[] sale : salesHistory) {
+            try {
+                soldUnits += Long.parseLong(sale[3]);
+                revenue += Long.parseLong(sale[5]);
+            } catch (NumberFormatException ignored) {
+                // Skip malformed legacy history rows instead of stopping the report.
+            }
+        }
+
+        String report = "THỐNG KÊ CỬA HÀNG\\n\\n"
+                + "Số loại sản phẩm: " + productKinds + "\\n"
+                + "Tổng số lượng tồn: " + units + "\\n"
+                + "Sản phẩm sắp hết (≤ 5): " + low + "\\n"
+                + "Sản phẩm hết hàng: " + out + "\\n"
+                + "Giá trị tồn kho theo giá bán: " + money(stockValue) + "\\n\\n"
+                + "Tổng số lượng đã bán (lịch sử): " + soldUnits + "\\n"
+                + "Tổng doanh thu ghi nhận: " + money(revenue);
+        JOptionPane.showMessageDialog(this, report, "Thống kê", JOptionPane.INFORMATION_MESSAGE);
     }
 
     private JPanel statCard(String heading, JLabel value, String note) {
