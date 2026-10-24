@@ -435,6 +435,14 @@ public class MainWindow extends JFrame {
                     long unitPrice = Long.parseLong(parts[4]);
                     long amount = Long.parseLong(parts[5]);
                     if (quantity <= 0 || unitPrice < 0 || amount < 0) continue;
+                    long expectedAmount;
+                    try {
+                        expectedAmount = Math.multiplyExact(unitPrice, (long) quantity);
+                    } catch (ArithmeticException overflow) {
+                        continue;
+                    }
+                    // Reject corrupted records whose total does not match quantity × unit price.
+                    if (amount != expectedAmount) continue;
                     salesHistory.add(new String[]{parts[0], parts[1], name,
                             Integer.toString(quantity), Long.toString(unitPrice), Long.toString(amount)});
                 } catch (IllegalArgumentException ignored) {
