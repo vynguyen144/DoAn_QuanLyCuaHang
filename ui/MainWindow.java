@@ -463,7 +463,7 @@ public class MainWindow extends JFrame {
             return;
         }
         products.add(result.product());
-        saveAndRefresh();
+        if (!saveAndRefresh()) products.remove(result.product());
     }
 
     private void editSelected() {
@@ -475,7 +475,7 @@ public class MainWindow extends JFrame {
         replacement.setId(old.getId());
         int index = products.indexOf(old);
         products.set(index, replacement);
-        saveAndRefresh();
+        if (!saveAndRefresh()) products.set(index, old);
     }
 
     private void deleteSelected() {
@@ -485,8 +485,9 @@ public class MainWindow extends JFrame {
                 "Xóa sản phẩm “" + product.getName() + "” khỏi kho?", "Xác nhận xóa",
                 JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (choice == JOptionPane.YES_OPTION) {
+            int index = products.indexOf(product);
             products.remove(product);
-            saveAndRefresh();
+            if (!saveAndRefresh()) products.add(Math.min(index, products.size()), product);
         }
     }
 
@@ -513,10 +514,25 @@ public class MainWindow extends JFrame {
                 return;
             }
             int newQuantity = Math.addExact(product.getQuantity(), quantity);
-            appendStockReceipt(product, quantity, supplierField.getText().trim());
+            int previousQuantity = product.getQuantity();
+            LocalDate previousReceivedDate = product.getReceivedDate();
             product.setQuantity(newQuantity);
             product.setReceivedDate(LocalDate.now());
-            saveAndRefresh();
+            if (!saveAndRefresh()) {
+                product.setQuantity(previousQuantity);
+                product.setReceivedDate(previousReceivedDate);
+                refreshProducts();
+                refreshDashboard();
+                return;
+            }
+            try {
+                appendStockReceipt(product, quantity, supplierField.getText().trim());
+            } catch (IOException historyError) {
+                product.setQuantity(previousQuantity);
+                product.setReceivedDate(previousReceivedDate);
+                saveAndRefresh();
+                throw historyError;
+            }
             JOptionPane.showMessageDialog(this,
                     "Đã nhập thêm " + quantity + " sản phẩm: " + product.getName()
                             + (supplierField.getText().trim().isEmpty() ? "" : "\nNhà cung cấp: " + supplierField.getText().trim())
@@ -601,9 +617,21 @@ public class MainWindow extends JFrame {
                 JOptionPane.showMessageDialog(this, "Tổng tiền vượt giới hạn cho phép.");
                 return;
             }
-            appendSale(product, quantity, unitPrice, amount);
-            product.setQuantity(product.getQuantity() - quantity);
-            saveAndRefresh();
+            int previousQuantity = product.getQuantity();
+            product.setQuantity(previousQuantity - quantity);
+            if (!saveAndRefresh()) {
+                product.setQuantity(previousQuantity);
+                refreshProducts();
+                refreshDashboard();
+                return;
+            }
+            try {
+                appendSale(product, quantity, unitPrice, amount);
+            } catch (IOException saleError) {
+                product.setQuantity(previousQuantity);
+                saveAndRefresh();
+                throw saleError;
+            }
             refreshSalesHistory();
             JOptionPane.showMessageDialog(this,
                     "BÁN HÀNG THÀNH CÔNG\n\n" + product.getName() + " × " + quantity
@@ -631,10 +659,18 @@ public class MainWindow extends JFrame {
         return null;
     }
 
-    private void saveAndRefresh() {
-        FileManager.ghiFile(products);
-        refreshProducts();
-        refreshDashboard();
+    private boolean saveAndRefresh() {
+        try {
+            FileManager.ghiFile(products);
+            refreshProducts();
+            refreshDashboard();
+            return true;
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this,
+                    "Không thể lưu dữ liệu sản phẩm. Thay đổi chưa được áp dụng.\\n" + ex.getMessage(),
+                    "Lỗi lưu dữ liệu", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
     }
 
     private static String typeName(Product p) {
