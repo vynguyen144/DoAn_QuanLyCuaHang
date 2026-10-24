@@ -99,6 +99,7 @@ public final class FileManager {
                 try {
                     Product product = line.startsWith(FORMAT_MARKER + "\t")
                             ? parseCurrentFormat(line)
+                            : line.startsWith(FORMAT_MARKER + "\\t") ? parseBrokenCurrentFormat(line)
                             : line.startsWith("V2\t") ? parseV2Format(line) : parseLegacyFormat(line);
                     if (product != null) {
                         productList.add(product);
@@ -143,6 +144,24 @@ public final class FileManager {
         return product;
     }
 
+    /** Recovers rows written by older builds with literal backslash-t delimiters. */
+    private static Product parseBrokenCurrentFormat(String line) {
+        String[] parts = line.split("\\\\t", -1);
+        if (parts.length != 8 || !FORMAT_MARKER.equals(parts[0])) {
+            throw new IllegalArgumentException("Sai số lượng trường ở định dạng V3 cũ");
+        }
+        Product product = createProduct(parts[1]);
+        if (product == null) return null;
+        product.setId(decode(parts[2]));
+        product.setName(decode(parts[3]));
+        product.setQuantity(Integer.parseInt(parts[4]));
+        product.setBasePrice(Integer.parseInt(parts[5]));
+        if (product instanceof Food) ((Food) product).setExpiryDays(Integer.parseInt(parts[6]));
+        else if (product instanceof Electronics) ((Electronics) product).setWarrantyMonths(Integer.parseInt(parts[6]));
+        else if (product instanceof Clothing) ((Clothing) product).setSize(decode(parts[6]));
+        product.setReceivedDate(java.time.LocalDate.parse(parts[7]));
+        return product;
+    }
     private static Product parseV2Format(String line) {
         String[] parts = line.split("\\t", -1);
         if (parts.length != 7 || !"V2".equals(parts[0])) throw new IllegalArgumentException("Sai số lượng trường ở định dạng V2");
