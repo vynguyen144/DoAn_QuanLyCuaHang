@@ -28,19 +28,15 @@ public final class FileManager {
     private FileManager() {
     }
 
-    public static void ghiFile(ArrayList<Product> productList) {
-        Path dataFile;
-        Path temporaryFile = null;
+    public static void ghiFile(ArrayList<Product> productList) throws IOException {
+        Path dataFile = AppPaths.getDataFile();
+        Path temporaryFile = Files.createTempFile(dataFile.getParent(), "store_data-", ".tmp");
+        boolean moved = false;
         try {
-            dataFile = AppPaths.getDataFile();
-            temporaryFile = Files.createTempFile(dataFile.getParent(), "store_data-", ".tmp");
-
             List<String> lines = new ArrayList<>();
             for (Product product : productList) {
                 String type = getType(product);
-                if (type == null) {
-                    continue;
-                }
+                if (type == null) continue;
 
                 String extra = "";
                 if (product instanceof Food) {
@@ -51,7 +47,7 @@ public final class FileManager {
                     extra = encode(((Clothing) product).getSize() == null ? "" : ((Clothing) product).getSize());
                 }
 
-                lines.add(String.join("\t",
+                lines.add(String.join("\\t",
                         FORMAT_MARKER,
                         type,
                         encode(product.getId() == null ? "" : product.getId()),
@@ -69,16 +65,10 @@ public final class FileManager {
             } catch (AtomicMoveNotSupportedException e) {
                 Files.move(temporaryFile, dataFile, StandardCopyOption.REPLACE_EXISTING);
             }
+            moved = true;
             System.out.println("-> [HỆ THỐNG] Đã lưu dữ liệu tại: " + dataFile);
-        } catch (IOException e) {
-            System.err.println("-> LỖI KHI GHI FILE: " + e.getMessage());
-            if (temporaryFile != null) {
-                try {
-                    Files.deleteIfExists(temporaryFile);
-                } catch (IOException ignored) {
-                    // Keep the original error as the useful diagnostic.
-                }
-            }
+        } finally {
+            if (!moved) Files.deleteIfExists(temporaryFile);
         }
     }
 
