@@ -293,7 +293,9 @@ public class MainWindow extends JFrame {
         sell.addActionListener(e -> sellSelected());
         JButton receive = new JButton("Nhập kho");
         receive.addActionListener(e -> receiveStock());
-        actions.add(edit); actions.add(delete); actions.add(sell); actions.add(receive);
+        JButton receiptHistory = new JButton("Lịch sử nhập kho");
+        receiptHistory.addActionListener(e -> showStockReceiptHistory());
+        actions.add(edit); actions.add(delete); actions.add(sell); actions.add(receive); actions.add(receiptHistory);
         panel.add(tools, BorderLayout.NORTH);
         panel.add(scroll, BorderLayout.CENTER);
         panel.add(actions, BorderLayout.SOUTH);
@@ -539,6 +541,38 @@ public class MainWindow extends JFrame {
         String line = String.join("\t", time, product.getId(), name, Integer.toString(quantity), vendor)
                 + System.lineSeparator();
         Files.writeString(file, line, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+    }
+
+    private void showStockReceiptHistory() {
+        Path file = AppPaths.getDataDirectory().resolve("stock_receipts.tsv");
+        String[] columns = {"Thời gian", "Mã sản phẩm", "Tên sản phẩm", "Số lượng nhập", "Nhà cung cấp"};
+        DefaultTableModel model = new DefaultTableModel(columns, 0) {
+            @Override public boolean isCellEditable(int row, int column) { return false; }
+        };
+        try {
+            if (Files.exists(file)) {
+                for (String line : Files.readAllLines(file, StandardCharsets.UTF_8)) {
+                    String[] parts = line.split("\\t", -1);
+                    if (parts.length != 5) continue;
+                    try {
+                        String name = new String(Base64.getDecoder().decode(parts[2]), StandardCharsets.UTF_8);
+                        String supplier = new String(Base64.getDecoder().decode(parts[4]), StandardCharsets.UTF_8);
+                        model.addRow(new Object[]{parts[0], parts[1], name, parts[3], supplier.isBlank() ? "—" : supplier});
+                    } catch (IllegalArgumentException ignored) { }
+                }
+            }
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Không đọc được lịch sử nhập kho: " + ex.getMessage(),
+                    "Lỗi dữ liệu", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        JTable historyTable = new JTable(model);
+        historyTable.setAutoCreateRowSorter(true);
+        historyTable.setRowHeight(30);
+        historyTable.setFillsViewportHeight(true);
+        JScrollPane scroll = new JScrollPane(historyTable);
+        scroll.setPreferredSize(new Dimension(760, 320));
+        JOptionPane.showMessageDialog(this, scroll, "Lịch sử nhập kho", JOptionPane.PLAIN_MESSAGE);
     }
 
     private void sellSelected() {
