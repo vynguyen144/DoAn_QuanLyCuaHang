@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Base64;
@@ -249,7 +250,9 @@ public class MainWindow extends JFrame {
         JButton sell = new JButton("Bán sản phẩm");
         sell.setBackground(blue); sell.setForeground(Color.WHITE);
         sell.addActionListener(e -> sellSelected());
-        actions.add(edit); actions.add(delete); actions.add(sell);
+        JButton receive = new JButton("Nhập kho");
+        receive.addActionListener(e -> receiveStock());
+        actions.add(edit); actions.add(delete); actions.add(sell); actions.add(receive);
         panel.add(tools, BorderLayout.NORTH);
         panel.add(scroll, BorderLayout.CENTER);
         panel.add(actions, BorderLayout.SOUTH);
@@ -397,6 +400,43 @@ public class MainWindow extends JFrame {
         if (choice == JOptionPane.YES_OPTION) {
             products.remove(product);
             saveAndRefresh();
+        }
+    }
+
+    private void receiveStock() {
+        Product product = selectedProduct();
+        if (product == null) return;
+
+        JTextField quantityField = new JTextField();
+        JTextField supplierField = new JTextField();
+        JPanel form = new JPanel(new GridLayout(0, 1, 6, 6));
+        form.add(new JLabel("Sản phẩm: " + product.getName()));
+        form.add(new JLabel("Tồn kho hiện tại: " + product.getQuantity()));
+        form.add(new JLabel("Số lượng nhập thêm:"));
+        form.add(quantityField);
+        form.add(new JLabel("Nhà cung cấp (không bắt buộc):"));
+        form.add(supplierField);
+        int choice = JOptionPane.showConfirmDialog(this, form, "Nhập kho", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (choice != JOptionPane.OK_OPTION) return;
+
+        try {
+            int quantity = Integer.parseInt(quantityField.getText().trim());
+            if (quantity <= 0) {
+                JOptionPane.showMessageDialog(this, "Số lượng nhập phải lớn hơn 0.");
+                return;
+            }
+            product.setQuantity(Math.addExact(product.getQuantity(), quantity));
+            product.setReceivedDate(LocalDate.now());
+            saveAndRefresh();
+            JOptionPane.showMessageDialog(this,
+                    "Đã nhập thêm " + quantity + " sản phẩm: " + product.getName()
+                            + (supplierField.getText().trim().isEmpty() ? "" : "\nNhà cung cấp: " + supplierField.getText().trim())
+                            + "\nTồn kho mới: " + product.getQuantity(),
+                    "Nhập kho thành công", JOptionPane.INFORMATION_MESSAGE);
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Vui lòng nhập số nguyên hợp lệ.");
+        } catch (ArithmeticException ex) {
+            JOptionPane.showMessageDialog(this, "Số lượng tồn kho vượt giới hạn cho phép.");
         }
     }
 
