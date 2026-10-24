@@ -36,7 +36,7 @@ public class MainWindow extends JFrame {
     private final JLabel lowStock = new JLabel("0");
     private final JLabel totalValue = new JLabel("0 đ");
     private final DefaultTableModel tableModel = new DefaultTableModel(
-            new Object[]{"Mã SP", "Tên sản phẩm", "Danh mục", "Tồn kho", "Giá bán", "Thông tin thêm"}, 0) {
+            new Object[]{"Mã SP", "Tên sản phẩm", "Danh mục", "Tồn kho", "Giá bán", "Ngày nhập gần nhất", "Thông tin thêm"}, 0) {
         @Override public boolean isCellEditable(int row, int column) { return false; }
     };
     private final JTable table = new JTable(tableModel);
@@ -347,7 +347,7 @@ public class MainWindow extends JFrame {
             if (!query.isEmpty() && !p.getId().toLowerCase(Locale.ROOT).contains(query)
                     && !p.getName().toLowerCase(Locale.ROOT).contains(query)) continue;
             tableModel.addRow(new Object[]{p.getId(), p.getName(), typeName(p), p.getQuantity(),
-                    money((long) p.calculateFinalPrice()), extraInfo(p)});
+                    money((long) p.calculateFinalPrice()), p.getReceivedDate() == null ? "—" : p.getReceivedDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")), extraInfo(p)});
         }
     }
 
