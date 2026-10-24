@@ -430,7 +430,9 @@ public class MainWindow extends JFrame {
                 String[] parts = line.replace("\\t", "\t").split("\\t", -1);
                 if (parts.length != 6) continue;
                 try {
+                    if (parts[0].isBlank() || parts[1].isBlank() || parts[2].isBlank()) continue;
                     String name = new String(Base64.getDecoder().decode(parts[2]), StandardCharsets.UTF_8);
+                    if (name.isBlank()) continue;
                     int quantity = Integer.parseInt(parts[3]);
                     long unitPrice = Long.parseLong(parts[4]);
                     long amount = Long.parseLong(parts[5]);
