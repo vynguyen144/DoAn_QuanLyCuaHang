@@ -377,7 +377,7 @@ public class MainWindow extends JFrame {
         }
         try {
             InvoiceExporter.export(sale, output);
-            JOptionPane.showMessageDialog(this, "Đã xuất hóa đơn PDF tại:\\n" + output.getAbsolutePath(),
+            JOptionPane.showMessageDialog(this, "Đã xuất hóa đơn PDF tại:\n" + output.getAbsolutePath(),
                     "Xuất hóa đơn thành công", JOptionPane.INFORMATION_MESSAGE);
         } catch (IOException | IllegalArgumentException ex) {
             JOptionPane.showMessageDialog(this, "Không thể xuất hóa đơn: " + ex.getMessage(),
