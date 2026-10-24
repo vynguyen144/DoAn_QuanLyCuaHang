@@ -204,23 +204,45 @@ public class MainWindow extends JFrame {
 
     private void showStatistics() {
         int productKinds = products.size();
-        int units = 0;
+        long units = 0;
         int low = 0;
         int out = 0;
         long stockValue = 0;
+        boolean stockValueOverflow = false;
         for (Product p : products) {
             units += p.getQuantity();
             if (p.getQuantity() <= 5) low++;
             if (p.getQuantity() <= 0) out++;
-            stockValue += (long) p.calculateFinalPrice() * p.getQuantity();
+            if (!stockValueOverflow) {
+                try {
+                    long itemValue = Math.multiplyExact((long) p.calculateFinalPrice(), (long) p.getQuantity());
+                    stockValue = Math.addExact(stockValue, itemValue);
+                } catch (ArithmeticException ex) {
+                    stockValueOverflow = true;
+                }
+            }
         }
 
         long revenue = 0;
         long soldUnits = 0;
+        boolean revenueOverflow = false;
+        boolean soldUnitsOverflow = false;
         for (String[] sale : salesHistory) {
             try {
-                soldUnits += Long.parseLong(sale[3]);
-                revenue += Long.parseLong(sale[5]);
+                if (!soldUnitsOverflow) {
+                    try {
+                        soldUnits = Math.addExact(soldUnits, Long.parseLong(sale[3]));
+                    } catch (ArithmeticException ex) {
+                        soldUnitsOverflow = true;
+                    }
+                }
+                if (!revenueOverflow) {
+                    try {
+                        revenue = Math.addExact(revenue, Long.parseLong(sale[5]));
+                    } catch (ArithmeticException ex) {
+                        revenueOverflow = true;
+                    }
+                }
             } catch (NumberFormatException ignored) {
                 // Skip malformed legacy history rows instead of stopping the report.
             }
@@ -231,9 +253,9 @@ public class MainWindow extends JFrame {
                 + "Tổng số lượng tồn: " + units + "\n"
                 + "Sản phẩm sắp hết (≤ 5): " + low + "\n"
                 + "Sản phẩm hết hàng: " + out + "\n"
-                + "Giá trị tồn kho theo giá bán: " + money(stockValue) + "\n\n"
-                + "Tổng số lượng đã bán (lịch sử): " + soldUnits + "\n"
-                + "Tổng doanh thu ghi nhận: " + money(revenue);
+                + "Giá trị tồn kho theo giá bán: " + (stockValueOverflow ? "Vượt giới hạn" : money(stockValue)) + "\n\n"
+                + "Tổng số lượng đã bán (lịch sử): " + (soldUnitsOverflow ? "Vượt giới hạn" : soldUnits) + "\n"
+                + "Tổng doanh thu ghi nhận: " + (revenueOverflow ? "Vượt giới hạn" : money(revenue));
         JOptionPane.showMessageDialog(this, report, "Thống kê", JOptionPane.INFORMATION_MESSAGE);
     }
 
