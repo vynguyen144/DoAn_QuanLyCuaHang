@@ -425,19 +425,35 @@ public class MainWindow extends JFrame {
                 JOptionPane.showMessageDialog(this, "Số lượng nhập phải lớn hơn 0.");
                 return;
             }
-            product.setQuantity(Math.addExact(product.getQuantity(), quantity));
+            int newQuantity = Math.addExact(product.getQuantity(), quantity);
+            appendStockReceipt(product, quantity, supplierField.getText().trim());
+            product.setQuantity(newQuantity);
             product.setReceivedDate(LocalDate.now());
             saveAndRefresh();
             JOptionPane.showMessageDialog(this,
                     "Đã nhập thêm " + quantity + " sản phẩm: " + product.getName()
                             + (supplierField.getText().trim().isEmpty() ? "" : "\nNhà cung cấp: " + supplierField.getText().trim())
-                            + "\nTồn kho mới: " + product.getQuantity(),
+                            + "\nTồn kho mới: " + product.getQuantity()
+                            + "\nLịch sử nhập kho đã được lưu.",
                     "Nhập kho thành công", JOptionPane.INFORMATION_MESSAGE);
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Vui lòng nhập số nguyên hợp lệ.");
         } catch (ArithmeticException ex) {
             JOptionPane.showMessageDialog(this, "Số lượng tồn kho vượt giới hạn cho phép.");
+        } catch (IOException ex) {
+            JOptionPane.showMessageDialog(this, "Không thể lưu phiếu nhập kho: " + ex.getMessage(),
+                    "Lỗi lưu dữ liệu", JOptionPane.ERROR_MESSAGE);
         }
+    }
+
+    private void appendStockReceipt(Product product, int quantity, String supplier) throws IOException {
+        Path file = AppPaths.getDataDirectory().resolve("stock_receipts.tsv");
+        String time = LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+        String name = Base64.getEncoder().encodeToString(product.getName().getBytes(StandardCharsets.UTF_8));
+        String vendor = Base64.getEncoder().encodeToString(supplier.getBytes(StandardCharsets.UTF_8));
+        String line = String.join("\\t", time, product.getId(), name, Integer.toString(quantity), vendor)
+                + System.lineSeparator();
+        Files.writeString(file, line, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
 
     private void sellSelected() {
