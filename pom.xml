@@ -15,6 +15,11 @@
             <artifactId>flatlaf</artifactId>
             <version>3.6.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>3.0.5</version>
+        </dependency>
     </dependencies>
     <build>
         <sourceDirectory>${project.basedir}</sourceDirectory>
