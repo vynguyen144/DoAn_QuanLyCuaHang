@@ -140,15 +140,12 @@ public final class FileManager {
         } else if (product instanceof Clothing) {
             ((Clothing) product).setSize(decode(parts[6]));
         }
-        return product;
-    }
-
         product.setReceivedDate(java.time.LocalDate.parse(parts[7]));
         return product;
     }
 
     private static Product parseV2Format(String line) {
-        String[] parts = line.split("\\\\t", -1);
+        String[] parts = line.split("\\t", -1);
         if (parts.length != 7 || !"V2".equals(parts[0])) throw new IllegalArgumentException("Sai số lượng trường ở định dạng V2");
         Product product = createProduct(parts[1]);
         if (product == null) return null;
