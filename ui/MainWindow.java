@@ -431,8 +431,15 @@ public class MainWindow extends JFrame {
                 if (parts.length != 6) continue;
                 try {
                     String name = new String(Base64.getDecoder().decode(parts[2]), StandardCharsets.UTF_8);
-                    salesHistory.add(new String[]{parts[0], parts[1], name, parts[3], parts[4], parts[5]});
-                } catch (IllegalArgumentException ignored) { }
+                    int quantity = Integer.parseInt(parts[3]);
+                    long unitPrice = Long.parseLong(parts[4]);
+                    long amount = Long.parseLong(parts[5]);
+                    if (quantity <= 0 || unitPrice < 0 || amount < 0) continue;
+                    salesHistory.add(new String[]{parts[0], parts[1], name,
+                            Integer.toString(quantity), Long.toString(unitPrice), Long.toString(amount)});
+                } catch (IllegalArgumentException ignored) {
+                    // Skip malformed legacy rows so a damaged history file cannot crash the sales screen.
+                }
             }
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this, "Không đọc được lịch sử bán hàng: " + ex.getMessage(),
