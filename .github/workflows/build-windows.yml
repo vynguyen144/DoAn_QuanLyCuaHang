@@ -1,9 +1,10 @@
-name: Build Windows desktop app
+name: Build Windows 64-bit app
 
 on:
   workflow_dispatch:
   push:
-    branches: [ feature/desktop-gui ]
+    branches:
+      - feature/inventory-invoices-statistics
     paths:
       - '**.java'
       - 'pom.xml'
@@ -16,41 +17,32 @@ jobs:
   build-windows:
     runs-on: windows-latest
     steps:
-      - name: Checkout feature branch
+      - name: Check out feature branch
         uses: actions/checkout@v4
         with:
-          ref: feature/desktop-gui
-      - name: Set up Java 21
+          ref: feature/inventory-invoices-statistics
+
+      - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '21'
+          java-version: '17'
           cache: maven
-      - name: Package application
-        run: mvn -B clean package
-      - name: Create portable app image
+
+      - name: Build application
+        run: mvn --batch-mode --no-transfer-progress clean package
+
+      - name: Package Windows app with bundled Java runtime
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force release | Out-Null
-          Add-Type -AssemblyName System.Drawing
-          $bmp = New-Object System.Drawing.Bitmap 256, 256
-          $g = [System.Drawing.Graphics]::FromImage($bmp)
-          $g.SmoothingMode = [System.Drawing.Drawing2D.SmoothingMode]::AntiAlias
-          $g.Clear([System.Drawing.Color]::FromArgb(12, 29, 72))
-          $teal = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(23, 190, 190))
-          $orange = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 174, 54))
-          $cream = New-Object System.Drawing.SolidBrush ([System.Drawing.Color]::FromArgb(255, 244, 220))
-          $g.FillRectangle($teal, 52, 46, 152, 24)
-          $g.FillPolygon($orange, @([System.Drawing.Point]::new(38,88),[System.Drawing.Point]::new(218,88),[System.Drawing.Point]::new(198,120),[System.Drawing.Point]::new(58,120)))
-          $g.FillRectangle($cream, 60, 116, 136, 76)
-          $g.FillRectangle($teal, 145, 132, 32, 32)
-          $g.FillRectangle($orange, 112, 158, 68, 56)
-          $icon = [System.Drawing.Icon]::FromHandle($bmp.GetHicon())
-          $stream = [System.IO.File]::Create("$PWD/release/app.ico")
-          $icon.Save($stream); $stream.Dispose(); $icon.Dispose(); $g.Dispose(); $bmp.Dispose()
-          jpackage --type app-image --name QuanLyCuaHang --input target --main-jar QuanLyCuaHang.jar --main-class ui.DesktopApp --icon release/app.ico --dest release
+          if (!(Test-Path "target/QuanLyCuaHang.jar")) {
+            throw "Không tìm thấy target/QuanLyCuaHang.jar sau khi Maven build."
+          }
+          jpackage --type app-image --name QuanLyCuaHang --input target --main-jar QuanLyCuaHang.jar --main-class ui.DesktopApp --dest release
           Compress-Archive -Path release/QuanLyCuaHang -DestinationPath release/QuanLyCuaHang-windows-x64.zip
-      - name: Upload portable application
+
+      - name: Upload Windows 64-bit app
         uses: actions/upload-artifact@v4
         with:
           name: QuanLyCuaHang-windows-x64
