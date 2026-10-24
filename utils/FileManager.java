@@ -28,7 +28,15 @@ public final class FileManager {
     private FileManager() {
     }
 
-    public static void ghiFile(ArrayList<Product> productList) throws IOException {
+    public static void ghiFile(ArrayList<Product> productList) {
+        try {
+            ghiFileOrThrow(productList);
+        } catch (IOException e) {
+            System.err.println("-> LỖI KHI GHI FILE: " + e.getMessage());
+        }
+    }
+
+    public static void ghiFileOrThrow(ArrayList<Product> productList) throws IOException {
         Path dataFile = AppPaths.getDataFile();
         Path temporaryFile = Files.createTempFile(dataFile.getParent(), "store_data-", ".tmp");
         boolean moved = false;
