@@ -19,6 +19,15 @@ Mục tiêu của đồ án là vận dụng kiến thức lập trình hướng
 - **Lưu trữ dữ liệu:** Đọc và ghi dữ liệu sản phẩm để sử dụng lại khi mở chương trình.
 - **Giao diện desktop:** Cung cấp các trang tổng quan, quản lý sản phẩm và bán hàng.
 
+## Chức năng bổ sung trên nhánh phát triển
+
+- **Nhập kho:** Cộng số lượng nhập vào tồn kho, lưu ngày nhập gần nhất và ghi lịch sử nhập kho kèm nhà cung cấp (nếu có).
+- **Lịch sử nhập kho:** Xem lại các lần nhập theo thời gian, mã/tên sản phẩm, số lượng và nhà cung cấp; có thể sắp xếp bảng.
+- **Thống kê cửa hàng:** Tổng hợp số loại sản phẩm, tồn kho, mặt hàng sắp hết/hết hàng, giá trị tồn theo giá bán, số lượng đã bán và doanh thu ghi nhận.
+- **Xuất hóa đơn PDF:** Xuất hóa đơn cho giao dịch đã chọn trong lịch sử bán hàng.
+- **Ngày nhập hàng:** Hiển thị ngày nhập gần nhất trong danh sách sản phẩm.
+- **Kiểm tra tự động:** GitHub Actions chạy `mvn clean package` với Java 17 khi cập nhật nhánh phát triển hoặc mở pull request vào `main`.
+
 ## Công nghệ sử dụng
 
 | Công nghệ | Mục đích |
