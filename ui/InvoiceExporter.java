@@ -100,6 +100,19 @@ public final class InvoiceExporter {
         return new PDType1Font(Standard14Fonts.FontName.HELVETICA);
     }
 
+    private static String toAsciiFallback(String text) {
+        String normalized = Normalizer.normalize(text, Normalizer.Form.NFD);
+        StringBuilder result = new StringBuilder();
+        for (int i = 0; i < normalized.length(); i++) {
+            char ch = normalized.charAt(i);
+            int kind = Character.getType(ch);
+            if (kind == Character.NON_SPACING_MARK || kind == Character.COMBINING_SPACING_MARK) continue;
+            if (ch == 'đ') ch = 'd';
+            if (ch == 'Đ') ch = 'D';
+            result.append(ch >= 32 && ch <= 126 ? ch : '?');
+        }
+        return result.toString();
+    }
     private static String money(long value) {
         return NumberFormat.getIntegerInstance(new Locale("vi", "VN")).format(value) + " VND";
     }
