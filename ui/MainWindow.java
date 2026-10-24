@@ -594,7 +594,13 @@ public class MainWindow extends JFrame {
                 return;
             }
             long unitPrice = (long) product.calculateFinalPrice();
-            long amount = unitPrice * quantity;
+            long amount;
+            try {
+                amount = Math.multiplyExact(unitPrice, (long) quantity);
+            } catch (ArithmeticException ex) {
+                JOptionPane.showMessageDialog(this, "Tổng tiền vượt giới hạn cho phép.");
+                return;
+            }
             appendSale(product, quantity, unitPrice, amount);
             product.setQuantity(product.getQuantity() - quantity);
             saveAndRefresh();
