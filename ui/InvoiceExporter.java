@@ -89,13 +89,20 @@ public final class InvoiceExporter {
                 "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
                 "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf"
         };
+        IOException lastFontError = null;
         for (String candidate : candidates) {
             File fontFile = new File(candidate);
-            if (fontFile.isFile()) {
+            if (!fontFile.isFile()) continue;
+            try {
                 return PDType0Font.load(document, fontFile);
+            } catch (IOException ex) {
+                // A font may exist but be unreadable or unsupported; try the next candidate.
+                if (lastFontError == null) lastFontError = ex;
+                else lastFontError.addSuppressed(ex);
             }
         }
-        // Standard font fallback keeps export available on systems without a common Unicode font.
+        // Standard font fallback keeps export available on systems without a usable Unicode font.
+        // Helvetica cannot render Vietnamese accents, so write() applies an ASCII fallback.
         return new PDType1Font(Standard14Fonts.FontName.HELVETICA);
     }
 
