@@ -111,6 +111,7 @@ public final class FileManager {
             System.out.println("-> [HỆ THỐNG] Đã đọc dữ liệu từ: " + file);
         } catch (IOException e) {
             System.err.println("-> LỖI KHI ĐỌC FILE: " + e.getMessage());
+            throw new IllegalStateException("Không thể đọc dữ liệu sản phẩm. Để tránh ghi đè dữ liệu hiện có, ứng dụng sẽ dừng thao tác đọc.", e);
         }
         return productList;
     }
