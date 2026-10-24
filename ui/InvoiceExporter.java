@@ -36,8 +36,7 @@ public final class InvoiceExporter {
                 y -= 12;
                 y = write(stream, font, 11, y, "Store Desk - Quan ly cua hang", 11);
                 y -= 18;
-                y = write(stream, font, 11, y, "Ma giao dich: " + sale[1], 11);
-                y = write(stream, font, 11, y, "Thoi gian: " + sale[0], 11);
+                y = write(stream, font, 11, y, "Thoi gian giao dich: " + sale[0], 11);
                 y -= 18;
                 y = write(stream, font, 12, y, "THONG TIN SAN PHAM", 12);
                 y -= 5;
