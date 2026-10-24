@@ -11,6 +11,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -62,7 +63,7 @@ public final class InvoiceExporter {
             stream.beginText();
             stream.setFont(font, size);
             stream.newLineAtOffset(x, y);
-            stream.showText(line);
+            stream.showText(font instanceof PDType1Font ? toAsciiFallback(line) : line);
             stream.endText();
             y -= size + 7;
         }
