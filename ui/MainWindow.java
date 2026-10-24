@@ -320,8 +320,14 @@ public class MainWindow extends JFrame {
                     "Chọn sản phẩm trong bảng rồi bấm “Bán sản phẩm” để tạo giao dịch.",
                     "Tạo giao dịch", JOptionPane.INFORMATION_MESSAGE);
         });
+        JButton invoice = new JButton("Xuất hóa đơn PDF");
+        invoice.addActionListener(e -> exportSelectedInvoice());
+        JPanel salesActions = new JPanel(new FlowLayout(FlowLayout.RIGHT, 8, 0));
+        salesActions.setOpaque(false);
+        salesActions.add(invoice);
+        salesActions.add(sell);
         toolbar.add(heading, BorderLayout.WEST);
-        toolbar.add(sell, BorderLayout.EAST);
+        toolbar.add(salesActions, BorderLayout.EAST);
 
         salesTable = new JTable(salesTableModel);
         salesTable.setRowHeight(36);
@@ -339,6 +345,44 @@ public class MainWindow extends JFrame {
         panel.add(scroll, BorderLayout.CENTER);
         panel.add(note, BorderLayout.SOUTH);
         return panel;
+    }
+
+    private void exportSelectedInvoice() {
+        if (salesTable == null || salesTable.getSelectedRow() < 0) {
+            JOptionPane.showMessageDialog(this, "Hãy chọn một giao dịch trong lịch sử trước.",
+                    "Chưa chọn giao dịch", JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+        int viewRow = salesTable.convertRowIndexToModel(salesTable.getSelectedRow());
+        int historyIndex = salesHistory.size() - 1 - viewRow;
+        if (historyIndex < 0 || historyIndex >= salesHistory.size()) {
+            JOptionPane.showMessageDialog(this, "Không tìm thấy dữ liệu giao dịch đã chọn.",
+                    "Lỗi dữ liệu", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        String[] sale = salesHistory.get(historyIndex);
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Lưu hóa đơn PDF");
+        String safeId = sale[1].replaceAll("[^a-zA-Z0-9_-]", "_");
+        chooser.setSelectedFile(new java.io.File("HoaDon_" + safeId + ".pdf"));
+        if (chooser.showSaveDialog(this) != JFileChooser.APPROVE_OPTION) return;
+        java.io.File output = chooser.getSelectedFile();
+        if (!output.getName().toLowerCase(Locale.ROOT).endsWith(".pdf")) {
+            output = new java.io.File(output.getParentFile(), output.getName() + ".pdf");
+        }
+        if (output.exists()) {
+            int overwrite = JOptionPane.showConfirmDialog(this, "Tệp đã tồn tại. Bạn muốn ghi đè không?",
+                    "Xác nhận ghi đè", JOptionPane.YES_NO_OPTION);
+            if (overwrite != JOptionPane.YES_OPTION) return;
+        }
+        try {
+            InvoiceExporter.export(sale, output);
+            JOptionPane.showMessageDialog(this, "Đã xuất hóa đơn PDF tại:\\n" + output.getAbsolutePath(),
+                    "Xuất hóa đơn thành công", JOptionPane.INFORMATION_MESSAGE);
+        } catch (IOException | IllegalArgumentException ex) {
+            JOptionPane.showMessageDialog(this, "Không thể xuất hóa đơn: " + ex.getMessage(),
+                    "Lỗi xuất hóa đơn", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void refreshSalesHistory() {
