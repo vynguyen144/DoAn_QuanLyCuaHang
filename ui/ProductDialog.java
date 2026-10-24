@@ -8,6 +8,7 @@ import models.Product;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.time.LocalDate;
 
 final class ProductDialog {
     record Result(Product product) {}
@@ -93,6 +94,7 @@ final class ProductDialog {
         product.setName(productName);
         product.setQuantity((Integer) quantity.getValue());
         product.setBasePrice((Integer) price.getValue());
+        product.setReceivedDate(existing == null ? LocalDate.now() : existing.getReceivedDate());
         return new Result(product);
     }
 
