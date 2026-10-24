@@ -667,7 +667,7 @@ public class MainWindow extends JFrame {
             return true;
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(this,
-                    "Không thể lưu dữ liệu sản phẩm. Thay đổi chưa được áp dụng.\\n" + ex.getMessage(),
+                    "Không thể lưu dữ liệu sản phẩm. Thay đổi chưa được áp dụng.\n" + ex.getMessage(),
                     "Lỗi lưu dữ liệu", JOptionPane.ERROR_MESSAGE);
             return false;
         }
