@@ -617,10 +617,14 @@ public class MainWindow extends JFrame {
                     String[] parts = line.split("\\t", -1);
                     if (parts.length != 5) continue;
                     try {
+                        int quantity = Integer.parseInt(parts[3]);
+                        if (quantity <= 0 || parts[0].isBlank() || parts[1].isBlank()) continue;
                         String name = new String(Base64.getDecoder().decode(parts[2]), StandardCharsets.UTF_8);
                         String supplier = new String(Base64.getDecoder().decode(parts[4]), StandardCharsets.UTF_8);
-                        model.addRow(new Object[]{parts[0], parts[1], name, parts[3], supplier.isBlank() ? "—" : supplier});
-                    } catch (IllegalArgumentException ignored) { }
+                        model.addRow(new Object[]{parts[0], parts[1], name, quantity, supplier.isBlank() ? "—" : supplier});
+                    } catch (IllegalArgumentException ignored) {
+                        // Ignore malformed receipt rows so one damaged line does not block the history view.
+                    }
                 }
             }
         } catch (IOException ex) {
