@@ -661,7 +661,7 @@ public class MainWindow extends JFrame {
 
     private boolean saveAndRefresh() {
         try {
-            FileManager.ghiFile(products);
+            FileManager.ghiFileOrThrow(products);
             refreshProducts();
             refreshDashboard();
             return true;
