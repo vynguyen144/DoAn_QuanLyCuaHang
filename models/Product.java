@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Scanner;
+import java.time.LocalDate;
 import utils.InputHelper;
 
 public abstract class Product {
@@ -8,6 +9,7 @@ public abstract class Product {
     protected String name;
     protected int quantity;
     protected int basePrice;
+    protected LocalDate receivedDate = LocalDate.now();
 
     public Product() {}
 
@@ -30,4 +32,6 @@ public abstract class Product {
     public void setName(String name) { this.name = name; }
     public int getBasePrice() { return this.basePrice; }
     public void setBasePrice(int basePrice) { this.basePrice = basePrice; }
+    public LocalDate getReceivedDate() { return receivedDate; }
+    public void setReceivedDate(LocalDate receivedDate) { this.receivedDate = receivedDate == null ? LocalDate.now() : receivedDate; }
 }
