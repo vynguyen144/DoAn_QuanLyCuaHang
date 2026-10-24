@@ -89,7 +89,6 @@ public final class InvoiceExporter {
                 "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",
                 "/usr/share/fonts/truetype/liberation2/LiberationSans-Regular.ttf"
         };
-        IOException lastFontError = null;
         for (String candidate : candidates) {
             File fontFile = new File(candidate);
             if (!fontFile.isFile()) continue;
@@ -97,8 +96,7 @@ public final class InvoiceExporter {
                 return PDType0Font.load(document, fontFile);
             } catch (IOException ex) {
                 // A font may exist but be unreadable or unsupported; try the next candidate.
-                if (lastFontError == null) lastFontError = ex;
-                else lastFontError.addSuppressed(ex);
+                // Continue with the next candidate font.
             }
         }
         // Standard font fallback keeps export available on systems without a usable Unicode font.
